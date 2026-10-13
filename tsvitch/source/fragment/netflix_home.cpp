@@ -3,7 +3,7 @@
 #include <borealis/core/touch/tap_gesture.hpp>
 #include <borealis/views/label.hpp>
 #include <borealis/views/image.hpp>
-#include <borealis/views/scrolling_frame.hpp>
+#include <borealis.hpp>
 
 #include "fragment/netflix_home.hpp"
 #include "config/catalog_config.h"
