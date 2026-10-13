@@ -55,4 +55,8 @@ cmake -B ${BUILD_DIR} \
   ${EXTRA_FLAGS[@]} \
   ${GITHUB_TOKEN_FLAG}
 
-make -C ${BUILD_DIR} TsVitch.nro -j$(nproc)
+make -C ${BUILD_DIR} TsVitch.nro -j$(nproc) || {
+    echo "=== Parallel build failed, retrying serially to show the real error ==="
+    make -C ${BUILD_DIR} TsVitch.nro -j1 VERBOSE=1 2>&1 | tail -n 80
+    exit 1
+}
