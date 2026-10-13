@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor de Catálogo — TsVitch</title>
+<style>
+:root{--bg:#0e1014;--panel:#171a21;--in:#0b0d11;--line:#272b35;--red:#e50914;--txt:#f2f3f5;--mut:#9aa1ad;--ok:#46d369;--warn:#f5a524;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.45 "Segoe UI",system-ui,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:rgba(14,16,20,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;flex:1;font-weight:700}
+header h1 b{color:var(--red)}
+button,.btn{font:inherit;background:var(--red);color:#fff;border:0;border-radius:6px;padding:8px 13px;cursor:pointer}
+button.sec,.btn.sec{background:#2a2f3b}
+button.sm{padding:4px 9px;font-size:12px}
+button:hover,.btn:hover{filter:brightness(1.15)}
+:focus-visible{outline:2px solid #fff;outline-offset:2px}
+main{display:grid;grid-template-columns:minmax(300px,390px) minmax(0,1fr);gap:16px;padding:16px 20px;max-width:1500px;margin:auto}
+@media(max-width:900px){main{grid-template-columns:minmax(0,1fr);padding:12px}}
+main>div{min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:14px}
+h2{font-size:14px;margin:0 0 8px;font-weight:600}
+label{display:block;font-size:12px;color:var(--mut);margin:9px 0 3px}
+input,textarea{width:100%;background:var(--in);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:8px 9px;font:inherit}
+input:focus,textarea:focus{border-color:#6b7280;outline:0}
+textarea{min-height:76px;resize:vertical}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.hint{font-size:12px;color:var(--mut);margin-top:5px}
+details{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+summary{cursor:pointer;font-weight:600}
+.res{display:flex;gap:8px;align-items:center;padding:6px;border-radius:6px;cursor:pointer}
+.res:hover{background:#222733}.res img{width:34px;height:48px;object-fit:cover;background:#222;border-radius:3px}
+/* prévia 16:9, tamanhos proporcionais à largura (cqw) */
+.tv{container-type:inline-size;aspect-ratio:16/9;background:#000;border:1px solid var(--line);border-radius:8px;overflow:hidden;position:relative}
+.hero{position:absolute;left:0;right:0;top:0;height:50%}
+.hero img{position:absolute;right:0;top:0;width:68%;height:100%;object-fit:cover}
+.hero i{position:absolute;inset:0;background:linear-gradient(90deg,#000 34%,rgba(0,0,0,.7) 55%,transparent),linear-gradient(0deg,#000,transparent 30%)}
+.hero div{position:absolute;left:3cqw;top:0;bottom:3cqw;width:44%;display:flex;flex-direction:column;justify-content:flex-end;gap:.8cqw}
+.hero small{font-size:1.5cqw;color:#bbb}.hero h3{margin:0;font-size:3.6cqw;line-height:1.05}
+.hero p{margin:0;font-size:1.5cqw;color:#ddd;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.hero span{background:#fff;color:#000;border-radius:.6cqw;padding:.7cqw 2.4cqw;font-size:1.7cqw;font-weight:700;width:fit-content}
+.rows{position:absolute;left:0;right:0;top:50%;bottom:0;padding:0 3cqw;overflow:hidden}
+.rows h4{margin:1cqw 0 .7cqw;font-size:1.8cqw}
+.pr{display:flex;gap:1.2cqw;margin-bottom:1.2cqw}
+.po{position:relative;flex:0 0 11cqw;height:16cqw;background:#262a33;border-radius:.5cqw;overflow:hidden;cursor:pointer;border:.25cqw solid transparent;font-size:1.3cqw;padding:.6cqw;display:flex;align-items:center;text-align:center}
+.po img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.po.sel{border-color:#fff}
+.po b{position:absolute;top:.4cqw;left:.4cqw;background:var(--red);font-size:1cqw;padding:0 .6cqw;border-radius:.3cqw}
+.empty{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut);text-align:center}
+/* biblioteca */
+.lib{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--line)}
+.lib img{width:30px;height:44px;object-fit:cover;background:#222;border-radius:3px;flex:none}
+.lib .t{flex:1 1 150px;min-width:0}.lib .t b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:11px;border-radius:4px;padding:0 6px;margin-right:4px;background:#3a2e12;color:var(--warn)}
+.tag.err{background:#3a1416;color:#ff6b72}.ok{color:var(--ok)}
+pre{background:var(--in);border:1px solid var(--line);border-radius:6px;padding:10px;max-height:240px;overflow:auto;font-size:12px;margin:8px 0 0}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(20px);background:#2a2f3b;padding:9px 14px;border-radius:8px;opacity:0;transition:.2s;pointer-events:none;display:flex;gap:10px;align-items:center;z-index:9}
+#toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1><b>TsVitch</b> · Editor de catálogo</h1>
+  <span class="hint" id="count"></span>
+  <label class="btn sec" style="margin:0;color:#fff">Importar JSON<input type="file" id="imp" accept=".json,application/json" hidden></label>
+  <button class="sec" id="copy">Copiar JSON</button>
+  <button id="down">Baixar catalogo.json</button>
+</header>
+<main>
+<div>
+  <section class="panel">
+    <h2>Adicionar vários links de uma vez</h2>
+    <textarea id="batch" placeholder="Um link por linha. Links do Internet Archive (archive.org/details/... ou /download/...) preenchem título, sinopse, ano e capa sozinhos."></textarea>
+    <div class="acts"><button id="runBatch">Adicionar links</button><span class="hint" id="bstat"></span></div>
+    <details><summary>Buscar no Internet Archive</summary>
+      <div class="row" style="margin-top:8px"><input id="q" placeholder="Nome do filme"><button class="sec" id="go" style="flex:0 0 auto">Buscar</button></div>
+      <div id="results"></div>
+    </details>
+  </section>
+  <section class="panel">
+    <h2 id="formTitle">Adicionar filme</h2>
+    <label for="url">Link do vídeo (.mp4 / .mkv) *</label><input id="url" placeholder="https://archive.org/download/ID/arquivo.mp4">
+    <div class="acts" style="margin-top:6px"><button class="sec sm" id="arch">Preencher pelo Archive</button></div>
+    <label for="titulo">Título *</label><input id="titulo">
+    <label for="descricao">Descrição</label><textarea id="descricao"></textarea>
+    <label for="capa">Capa (poster vertical)</label><input id="capa" placeholder="https://...jpg">
+    <label for="banner">Banner (imagem larga, opcional)</label><input id="banner" placeholder="https://...jpg">
+    <div class="row"><div><label for="data">Adicionado em</label><input id="data" type="date"></div><div><label for="ano">Ano</label><input id="ano" placeholder="1968"></div></div>
+    <label for="genero">Gênero</label><input id="genero" placeholder="Terror, Drama...">
+    <div class="acts"><button id="save">Adicionar</button><button class="sec" id="cancel" hidden>Cancelar edição</button><button class="sec" id="clearAll">Limpar tudo</button></div>
+    <div class="hint">Ctrl+Enter salva.</div>
+  </section>
+</div>
+<div>
+  <h2>Prévia no Switch (16:9)</h2>
+  <div class="tv" id="tv"></div>
+  <section class="panel" style="margin-top:14px">
+    <h2>Filmes <span class="hint" id="issues"></span></h2>
+    <input id="filter" placeholder="Filtrar por título">
+    <div id="lib"></div>
+  </section>
+  <section class="panel"><details style="border:0;margin:0;padding:0" open><summary>catalogo.json</summary>
+    <div class="hint">Suba no GitHub e coloque o link "raw" em <b>catalog_config.h</b>.</div><pre id="json"></pre></details></section>
+</div>
+</main>
+<div id="toast"></div>
+<script>
+const $=id=>document.getElementById(id),F=['url','titulo','descricao','capa','banner','data','ano','genero'];
+const VID=/\.(mp4|m4v|mkv|webm|avi|mov)(\?|#|$)/i;
+let movies=[],editing=-1,selected=0,trash=null;
+const today=()=>new Date().toISOString().slice(0,10);
+try{movies=JSON.parse(localStorage.getItem('catalogo')||'[]')}catch(e){}
+const persist=()=>{try{localStorage.setItem('catalogo',JSON.stringify(movies))}catch(e){}};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let tt;function toast(m,undo){const t=$('toast');t.textContent=m;if(undo){const b=document.createElement('button');b.className='sm';b.textContent='Desfazer';b.onclick=()=>{undo();t.classList.remove('on')};t.append(b)}t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),undo?5000:2200)}
+
+const aid=u=>(/archive\.org\/(?:download|details|embed)\/([^\/?#]+)/.exec(u||'')||[])[1];
+const one=v=>Array.isArray(v)?v[0]:v;
+function nameFrom(u){try{return decodeURIComponent(u.split('?')[0].split('/').pop()).replace(/\.[a-z0-9]+$/i,'').replace(/[._-]+/g,' ').trim()}catch(e){return u}}
+// resolve um item do Archive: escolhe o maior .mp4 (senão mkv/webm/avi) e lê os metadados
+async function fromArchive(id,keepUrl){
+  const j=await (await fetch('https://archive.org/metadata/'+id)).json(),m=j.metadata||{},fs=j.files||[];
+  const pick=re=>fs.filter(f=>re.test(f.name)).sort((a,b)=>(+b.size||0)-(+a.size||0))[0];
+  const f=pick(/\.(mp4|m4v)$/i)||pick(/\.(mkv|webm|avi|mov)$/i);
+  return{url:keepUrl||(f?'https://archive.org/download/'+id+'/'+encodeURI(f.name):''),titulo:String(one(m.title)||id),
+    descricao:String(one(m.description)||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0,400),
+    ano:String(one(m.date)||m.year||'').slice(0,4),capa:'https://archive.org/services/img/'+id}
+}
+function sorted(){return movies.map((m,i)=>({m,i})).sort((a,b)=>a.m.data!==b.m.data?((a.m.data||'')<(b.m.data||'')?1:-1):b.i-a.i)}
+
+function readForm(){const o={};F.forEach(k=>o[k]=$(k).value.trim());return o}
+function fillForm(o){F.forEach(k=>$(k).value=o[k]||'')}
+function resetForm(){editing=-1;fillForm({data:today()});$('formTitle').textContent='Adicionar filme';$('save').textContent='Adicionar';$('cancel').hidden=true}
+function edit(i){editing=i;fillForm(movies[i]);$('formTitle').textContent='Editando: '+movies[i].titulo;$('save').textContent='Salvar alterações';$('cancel').hidden=false;scrollTo({top:0,behavior:'smooth'})}
+function del(i){const m=movies.splice(i,1)[0];selected=0;persist();resetForm();render();toast('Removido: '+m.titulo,()=>{movies.splice(i,0,m);persist();render()})}
+
+$('url').addEventListener('input',()=>{const id=aid($('url').value);if(id&&!$('capa').value)$('capa').value='https://archive.org/services/img/'+id});
+$('arch').onclick=async()=>{
+  const id=aid($('url').value);if(!id)return toast('Cole um link archive.org/download/ID/... ou /details/ID');
+  try{const a=await fromArchive(id,/\/download\/[^\/]+\/.+/.test($('url').value)?$('url').value.trim():'');
+    for(const k of['url','titulo','descricao','ano','capa'])if(!$(k).value&&a[k])$(k).value=a[k];toast('Dados preenchidos')}
+  catch(e){toast('Não consegui buscar. Abra este arquivo direto no navegador (não pelo preview do chat).')}
+};
+$('save').onclick=()=>{
+  const o=readForm();if(!o.titulo||!o.url)return toast('Título e link do vídeo são obrigatórios');
+  if(editing>=0){movies[editing]=o;toast('Filme atualizado')}else{movies.push(o);selected=movies.length-1;toast('Filme adicionado')}
+  persist();resetForm();render()
+};
+$('cancel').onclick=resetForm;
+$('clearAll').onclick=()=>{if(!movies.length)return;const bak=movies;movies=[];persist();resetForm();render();toast('Catálogo esvaziado',()=>{movies=bak;persist();render()})};
+addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')$('save').click()});
+
+$('runBatch').onclick=async()=>{
+  const links=$('batch').value.split(/\s*\n\s*/).map(s=>s.trim()).filter(Boolean);if(!links.length)return toast('Cole pelo menos um link');
+  let n=0,fail=0;
+  for(const u of links){
+    $('bstat').textContent=`Processando ${++n} de ${links.length}...`;
+    if(movies.some(m=>m.url===u)){fail++;continue}
+    let o={url:u,titulo:nameFrom(u),data:today()};const id=aid(u);
+    if(id)try{Object.assign(o,await fromArchive(id,/\/download\/[^\/]+\/.+/.test(u)?u:''),{data:today()})}catch(e){o.capa='https://archive.org/services/img/'+id}
+    if(o.url)movies.push(o);else fail++;
+  }
+  persist();selected=movies.length-1;$('batch').value='';$('bstat').textContent='';render();
+  toast((links.length-fail)+' adicionado(s)'+(fail?`, ${fail} ignorado(s) (repetido ou sem vídeo)`:''));
+};
+$('go').onclick=async()=>{
+  const q=$('q').value.trim();if(!q)return;$('results').innerHTML='<div class="hint">Buscando...</div>';
+  try{
+    const u='https://archive.org/advancedsearch.php?q='+encodeURIComponent('title:('+q+') AND mediatype:movies')+'&fl[]=identifier&fl[]=title&fl[]=year&rows=12&output=json';
+    const d=(await (await fetch(u)).json()).response.docs;
+    $('results').innerHTML=d.length?d.map(x=>`<div class="res" tabindex="0" data-id="${esc(x.identifier)}"><img src="https://archive.org/services/img/${esc(x.identifier)}" alt=""><span>${esc(one(x.title))}<br><small class="hint">${esc(x.year||'')}</small></span></div>`).join(''):'<div class="hint">Nada encontrado.</div>';
+  }catch(e){$('results').innerHTML='<div class="hint">Falhou. Abra este arquivo direto no navegador.</div>'}
+};
+$('q').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
+async function pickRes(el){
+  const id=el.dataset.id;try{const a=await fromArchive(id,'');fillForm({...a,data:today(),genero:$('genero').value});
+    editing=-1;toast('Preenchido: confira e clique em Adicionar');scrollTo({top:0,behavior:'smooth'})}catch(e){toast('Não consegui abrir esse item')}
+}
+$('results').addEventListener('click',e=>{const r=e.target.closest('.res');if(r)pickRes(r)});
+$('results').addEventListener('keydown',e=>{if(e.key==='Enter'){const r=e.target.closest('.res');if(r)pickRes(r)}});
+
+function problems(m,i){
+  const p=[];if(!m.capa)p.push(['sem capa']);if(!m.descricao)p.push(['sem descrição']);
+  if(!VID.test(m.url)&&!/archive\.org\/download\//.test(m.url))p.push(['link não parece vídeo',1]);
+  if(movies.findIndex(x=>x.url===m.url)!==i)p.push(['link repetido',1]);return p;
+}
+function po(e,top){const{m,i}=e;return`<div class="po ${i===selected?'sel':''}" data-i="${i}">${top?'<b>NOVO</b>':''}${m.capa?`<img src="${esc(m.capa)}" alt="" loading="lazy" onerror="this.remove()">`:''}<span>${esc(m.titulo)}</span></div>`}
+
+function render(){
+  $('count').textContent=movies.length+' filme(s)';
+  const s=sorted();
+  if(selected>=movies.length)selected=0;
+  if(!s.length)$('tv').innerHTML='<div class="empty">Nenhum filme ainda.<br>Cole links ao lado e a prévia aparece aqui.</div>';
+  else{const h=movies[selected],meta=[h.ano,h.genero].filter(Boolean).join(' | ');
+    $('tv').innerHTML=`<div class="hero">${h.banner||h.capa?`<img src="${esc(h.banner||h.capa)}" alt="" onerror="this.remove()">`:''}<i></i><div><small>${esc(meta)}</small><h3>${esc(h.titulo)}</h3><p>${esc(h.descricao)}</p><span>▶ Assistir</span></div></div>
+    <div class="rows"><h4>Novos adicionados</h4><div class="pr">${s.slice(0,5).map(e=>po(e,1)).join('')}</div><h4>Todos os filmes</h4><div class="pr">${s.map(e=>po(e,0)).join('')}</div></div>`}
+  const f=$('filter').value.toLowerCase();let bad=0;
+  $('lib').innerHTML=s.filter(e=>e.m.titulo.toLowerCase().includes(f)).map(({m,i})=>{
+    const p=problems(m,i);if(p.length)bad++;
+    return`<div class="lib"><img src="${esc(m.capa)}" alt="" onerror="this.style.visibility='hidden'"><div class="t"><b>${esc(m.titulo)}</b><small class="hint">${esc(m.data||'sem data')}</small> ${p.map(x=>`<span class="tag ${x[1]?'err':''}">${x[0]}</span>`).join('')}</div>
+    <a class="btn sec sm" href="${esc(m.url)}" target="_blank" rel="noopener" title="Abrir o vídeo">Testar</a><button class="sec sm" data-e="${i}">Editar</button><button class="sm" data-d="${i}">Excluir</button></div>`}).join('')||'<div class="hint" style="padding:8px">Nada para mostrar.</div>';
+  $('issues').innerHTML=movies.length?(bad?`· ${bad} com aviso`:'· <span class="ok">tudo certo</span>'):'';
+  const out={filmes:movies.map((m,i)=>{const o={id:'filme-'+(i+1),titulo:m.titulo,url:m.url};
+    ['descricao','capa','banner','ano','genero'].forEach(k=>{if(m[k])o[k]=m[k]});if(m.data)o.adicionado_em=m.data;return o})};
+  $('json').textContent=JSON.stringify(out,null,2);window._out=out;
+}
+$('tv').addEventListener('click',e=>{const p=e.target.closest('.po');if(p){selected=+p.dataset.i;render()}});
+$('lib').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.e!==undefined)edit(+b.dataset.e);if(b.dataset.d!==undefined)del(+b.dataset.d)});
+$('filter').addEventListener('input',render);
+$('copy').onclick=async()=>{const t=JSON.stringify(window._out,null,2);try{await navigator.clipboard.writeText(t);toast('JSON copiado')}catch(e){const r=document.createRange();r.selectNode($('json'));getSelection().removeAllRanges();getSelection().addRange(r);toast('Selecionado: copie com Ctrl+C')}};
+$('down').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(window._out,null,2)],{type:'application/json'}));a.download='catalogo.json';a.click()};
+$('imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  try{const j=JSON.parse(await f.text()),l=Array.isArray(j)?j:(j.filmes||j.movies||[]);
+    movies=l.map(x=>({url:x.url||'',titulo:x.titulo||x.title||'',descricao:x.descricao||x.description||'',capa:x.capa||x.cover||'',banner:x.banner||'',data:x.adicionado_em||'',ano:x.ano||'',genero:x.genero||''})).filter(x=>x.titulo&&x.url);
+    selected=0;persist();render();toast(movies.length+' filme(s) importado(s)')}catch(err){toast('JSON inválido')}
+  e.target.value=''};
+resetForm();render();
+</script>
+</body>
+</html>
