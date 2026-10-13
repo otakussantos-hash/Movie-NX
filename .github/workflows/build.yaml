@@ -126,30 +126,29 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Fetch submodules (if missing)
+      - name: Fetch submodules (pinned to TsVitch v0.3.2)
         shell: bash
         run: |
-          clone() {
+          clone() {  # url path commit
             if [ -z "$(ls -A "$2" 2>/dev/null)" ]; then
-              rm -rf "$2"
-              if [ -n "$3" ]; then
-                git clone --depth 1 --recursive --branch "$3" "$1" "$2" \
-                  || git clone --depth 1 --recursive --branch "$4" "$1" "$2"
-              else
-                git clone --depth 1 --recursive "$1" "$2"
-              fi
+              rm -rf "$2"; mkdir -p "$2"
+              git -C "$2" init -q
+              git -C "$2" remote add origin "$1"
+              git -C "$2" fetch -q --depth 1 origin "$3"
+              git -C "$2" checkout -q FETCH_HEAD
+              git -C "$2" submodule update --init --recursive --depth 1
             fi
           }
-          clone https://github.com/xfangfang/borealis library/borealis
-          clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator
-          clone https://github.com/imageworks/pystring library/pystring
-          clone https://github.com/xfangfang/OpenCC library/OpenCC
-          clone https://github.com/sammycage/lunasvg library/lunasvg v2.4.1 v2.3.8
-          clone https://github.com/xfangfang/cpr library/cpr
-          clone https://github.com/xfangfang/mongoose library/mongoose
-          clone https://github.com/xfangfang/libpdr library/libpdr
-          clone https://github.com/fancycode/MemoryModule library/MemoryModule
-          clone https://github.com/nlohmann/json.git library/nlohmann_json
+          clone https://github.com/xfangfang/borealis library/borealis 35734ab7e40e6a790582f6d00721bbfbf8543429
+          clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator 2c9044de6b049ca25cb3cd1649ed7e27aa055138
+          clone https://github.com/imageworks/pystring library/pystring 962fd25b2583baadb47c90c4dc2922e50691cc57
+          clone https://github.com/xfangfang/OpenCC library/OpenCC ccae908834c2fe41ba02141fa5d0eef178a45080
+          clone https://github.com/sammycage/lunasvg library/lunasvg 49c8cb49ac81ddbdf303250bde2dc574604e71a7
+          clone https://github.com/xfangfang/cpr library/cpr 9c71db3a2b36c999ee698751a89cc6af3ee33e87
+          clone https://github.com/xfangfang/mongoose library/mongoose 05fe1f8e3617cf2f84f461f7c6708fe8c17a151b
+          clone https://github.com/xfangfang/libpdr library/libpdr b24fb9d0e761b716dddbfb45564750a9b6523966
+          clone https://github.com/fancycode/MemoryModule library/MemoryModule 5f83e41c3a3e7c6e8284a5c1afa5a38790809461
+          clone https://github.com/nlohmann/json.git library/nlohmann_json 6f6be3933270477ff0da1572568104d60f20b954
 
       - name: Build Nro
         run: |
@@ -188,30 +187,29 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Fetch submodules (if missing)
+      - name: Fetch submodules (pinned to TsVitch v0.3.2)
         shell: bash
         run: |
-          clone() {
+          clone() {  # url path commit
             if [ -z "$(ls -A "$2" 2>/dev/null)" ]; then
-              rm -rf "$2"
-              if [ -n "$3" ]; then
-                git clone --depth 1 --recursive --branch "$3" "$1" "$2" \
-                  || git clone --depth 1 --recursive --branch "$4" "$1" "$2"
-              else
-                git clone --depth 1 --recursive "$1" "$2"
-              fi
+              rm -rf "$2"; mkdir -p "$2"
+              git -C "$2" init -q
+              git -C "$2" remote add origin "$1"
+              git -C "$2" fetch -q --depth 1 origin "$3"
+              git -C "$2" checkout -q FETCH_HEAD
+              git -C "$2" submodule update --init --recursive --depth 1
             fi
           }
-          clone https://github.com/xfangfang/borealis library/borealis
-          clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator
-          clone https://github.com/imageworks/pystring library/pystring
-          clone https://github.com/xfangfang/OpenCC library/OpenCC
-          clone https://github.com/sammycage/lunasvg library/lunasvg v2.4.1 v2.3.8
-          clone https://github.com/xfangfang/cpr library/cpr
-          clone https://github.com/xfangfang/mongoose library/mongoose
-          clone https://github.com/xfangfang/libpdr library/libpdr
-          clone https://github.com/fancycode/MemoryModule library/MemoryModule
-          clone https://github.com/nlohmann/json.git library/nlohmann_json
+          clone https://github.com/xfangfang/borealis library/borealis 35734ab7e40e6a790582f6d00721bbfbf8543429
+          clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator 2c9044de6b049ca25cb3cd1649ed7e27aa055138
+          clone https://github.com/imageworks/pystring library/pystring 962fd25b2583baadb47c90c4dc2922e50691cc57
+          clone https://github.com/xfangfang/OpenCC library/OpenCC ccae908834c2fe41ba02141fa5d0eef178a45080
+          clone https://github.com/sammycage/lunasvg library/lunasvg 49c8cb49ac81ddbdf303250bde2dc574604e71a7
+          clone https://github.com/xfangfang/cpr library/cpr 9c71db3a2b36c999ee698751a89cc6af3ee33e87
+          clone https://github.com/xfangfang/mongoose library/mongoose 05fe1f8e3617cf2f84f461f7c6708fe8c17a151b
+          clone https://github.com/xfangfang/libpdr library/libpdr b24fb9d0e761b716dddbfb45564750a9b6523966
+          clone https://github.com/fancycode/MemoryModule library/MemoryModule 5f83e41c3a3e7c6e8284a5c1afa5a38790809461
+          clone https://github.com/nlohmann/json.git library/nlohmann_json 6f6be3933270477ff0da1572568104d60f20b954
 
       - name: install deps
         if: matrix.arch != 'Universal' || ( matrix.arch == 'Universal' && github.event.inputs.universal_macos == 'true')
