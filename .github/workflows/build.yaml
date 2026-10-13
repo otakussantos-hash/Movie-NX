@@ -129,6 +129,26 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Fetch submodules (if missing)
+        shell: bash
+        run: |
+          clone() {
+            if [ -z "$(ls -A "$2" 2>/dev/null)" ]; then
+              rm -rf "$2"
+              git clone --depth 1 --recursive "$1" "$2"
+            fi
+          }
+          clone https://github.com/xfangfang/borealis library/borealis
+          clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator
+          clone https://github.com/imageworks/pystring library/pystring
+          clone https://github.com/xfangfang/OpenCC library/OpenCC
+          clone https://github.com/sammycage/lunasvg library/lunasvg
+          clone https://github.com/xfangfang/cpr library/cpr
+          clone https://github.com/xfangfang/mongoose library/mongoose
+          clone https://github.com/xfangfang/libpdr library/libpdr
+          clone https://github.com/fancycode/MemoryModule library/MemoryModule
+          clone https://github.com/nlohmann/json.git library/nlohmann_json
+
       - name: Build Nro
         run: |
           docker run --platform linux/amd64 --rm \
@@ -164,6 +184,26 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Fetch submodules (if missing)
+        shell: bash
+        run: |
+          clone() {
+            if [ -z "$(ls -A "$2" 2>/dev/null)" ]; then
+              rm -rf "$2"
+              git clone --depth 1 --recursive "$1" "$2"
+            fi
+          }
+          clone https://github.com/xfangfang/borealis library/borealis
+          clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator
+          clone https://github.com/imageworks/pystring library/pystring
+          clone https://github.com/xfangfang/OpenCC library/OpenCC
+          clone https://github.com/sammycage/lunasvg library/lunasvg
+          clone https://github.com/xfangfang/cpr library/cpr
+          clone https://github.com/xfangfang/mongoose library/mongoose
+          clone https://github.com/xfangfang/libpdr library/libpdr
+          clone https://github.com/fancycode/MemoryModule library/MemoryModule
+          clone https://github.com/nlohmann/json.git library/nlohmann_json
 
       - name: install deps
         if: matrix.arch != 'Universal' || ( matrix.arch == 'Universal' && github.event.inputs.universal_macos == 'true')
