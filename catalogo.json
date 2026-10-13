@@ -1,0 +1,13 @@
+{
+  "filmes": [
+    {
+      "id": "filme-1",
+      "titulo": "Yuyu Hakusho",
+      "url": "https://archive.org/download/yu-yu-hakusho-720p/Yuyu%20Hakusho%20Completo%20Bluray%20720p%20Dublado/Yuyu%20Hakusho%20Completo%20Bluray%20720p%20Dublado/Yu%20Yu%20Hakusho%20EP.01%20-%20A%20Morte.mp4",
+      "descricao": "Anime",
+      "capa": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQ1x4vPwyDeE5g_n3z2bNZe_mt9UwpQ2WB2dspu_fw659yGGz-X",
+      "banner": "https://uploads.jovemnerd.com.br/wp-content/uploads/2017/12/yu-yu-hakusho-lancamento-episodio-especial-2018.jpg",
+      "adicionado_em": "2026-10-13"
+    }
+  ]
+}
