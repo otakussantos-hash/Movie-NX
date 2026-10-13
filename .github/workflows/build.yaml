@@ -81,7 +81,7 @@ jobs:
           fi
 
   release:
-    needs: [build-switch, build-macos, version]
+    needs: [build-switch, version]
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -106,9 +106,6 @@ jobs:
           tag_name: v${{ github.event.inputs.version }}
           files: |
             ${{ needs.version.outputs.DIST_NRO }}/TsVitch.nro
-            ${{ needs.version.outputs.DIST_INTEL_DMG }}/${{ needs.version.outputs.DIST_INTEL_DMG }}.dmg
-            ${{ needs.version.outputs.DIST_ARM_DMG }}/${{ needs.version.outputs.DIST_ARM_DMG }}.dmg
-            ${{ needs.version.outputs.DIST_UNIVERSAL_DMG }}/${{ needs.version.outputs.DIST_UNIVERSAL_DMG }}.dmg
           draft: true
           prerelease: false
           body_path: "CHANGELOG.md"
@@ -135,14 +132,19 @@ jobs:
           clone() {
             if [ -z "$(ls -A "$2" 2>/dev/null)" ]; then
               rm -rf "$2"
-              git clone --depth 1 --recursive "$1" "$2"
+              if [ -n "$3" ]; then
+                git clone --depth 1 --recursive --branch "$3" "$1" "$2" \
+                  || git clone --depth 1 --recursive --branch "$4" "$1" "$2"
+              else
+                git clone --depth 1 --recursive "$1" "$2"
+              fi
             fi
           }
           clone https://github.com/xfangfang/borealis library/borealis
           clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator
           clone https://github.com/imageworks/pystring library/pystring
           clone https://github.com/xfangfang/OpenCC library/OpenCC
-          clone https://github.com/sammycage/lunasvg library/lunasvg
+          clone https://github.com/sammycage/lunasvg library/lunasvg v2.4.1 v2.3.8
           clone https://github.com/xfangfang/cpr library/cpr
           clone https://github.com/xfangfang/mongoose library/mongoose
           clone https://github.com/xfangfang/libpdr library/libpdr
@@ -168,6 +170,7 @@ jobs:
           path: "cmake-build-switch/TsVitch.nro"
 
   build-macos:
+    if: false  # macOS desativado: build apenas do Nintendo Switch
     needs: [version]
     runs-on: macos-14
     strategy:
@@ -191,14 +194,19 @@ jobs:
           clone() {
             if [ -z "$(ls -A "$2" 2>/dev/null)" ]; then
               rm -rf "$2"
-              git clone --depth 1 --recursive "$1" "$2"
+              if [ -n "$3" ]; then
+                git clone --depth 1 --recursive --branch "$3" "$1" "$2" \
+                  || git clone --depth 1 --recursive --branch "$4" "$1" "$2"
+              else
+                git clone --depth 1 --recursive "$1" "$2"
+              fi
             fi
           }
           clone https://github.com/xfangfang/borealis library/borealis
           clone https://github.com/nayuki/QR-Code-generator library/QR-Code-generator
           clone https://github.com/imageworks/pystring library/pystring
           clone https://github.com/xfangfang/OpenCC library/OpenCC
-          clone https://github.com/sammycage/lunasvg library/lunasvg
+          clone https://github.com/sammycage/lunasvg library/lunasvg v2.4.1 v2.3.8
           clone https://github.com/xfangfang/cpr library/cpr
           clone https://github.com/xfangfang/mongoose library/mongoose
           clone https://github.com/xfangfang/libpdr library/libpdr
